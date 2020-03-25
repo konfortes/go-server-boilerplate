@@ -5,4 +5,4 @@ A Go gin server boilerplate
 ## Features
 
 - Graceful shutdown with shutdown hooks
-- Jaeger Tracing
+- Jaeger Tracing with extract from headers middleware
