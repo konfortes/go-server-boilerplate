@@ -47,7 +47,7 @@ func main() {
 
 func initialize() {
 	if isTracingEnabled() {
-		initJaeger("hands-on-k8s-web")
+		initJaeger("service-name")
 		customMiddlewares = append(customMiddlewares, jaegerMiddleware)
 	}
 }
@@ -56,8 +56,4 @@ func setMiddlewares(router *gin.Engine) {
 	for _, middleware := range customMiddlewares {
 		router.Use(middleware)
 	}
-
-	// TODO: FIX: logs are logged twice.
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
 }
