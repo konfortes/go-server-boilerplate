@@ -4,18 +4,19 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	ginprometheus "github.com/zsais/go-gin-prometheus"
 )
+
+// Person ...
+type Person struct {
+	Name string `json:"name" binding:"required"`
+	Age  int    `json:"age"`
+}
 
 func setRoutes(router *gin.Engine) {
 	// http localhost:3000/health
 	router.GET("/health", func(c *gin.Context) {
 		c.Data(http.StatusOK, "application/json", []byte("OK"))
 	})
-
-	// http localhost:3000/metrics
-	p := ginprometheus.NewPrometheus("service_name")
-	p.Use(router)
 
 	// http POST localhost:3000/person name='ronen' age:=36
 	router.POST("/person", func(c *gin.Context) {

@@ -1,37 +1,28 @@
 package main
 
 import (
-	"io"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	serverutils "github.com/konfortes/go-server-utils/serverutils"
 	opentracing "github.com/opentracing/opentracing-go"
 )
 
-// Person ...
-type Person struct {
-	Name string `json:"name" binding:"required"`
-	Age  int    `json:"age"`
-}
-
 var (
-	tracer            opentracing.Tracer
-	tracerCloser      io.Closer
-	shutdownHooks     []func()
-	customMiddlewares []gin.HandlerFunc
+	tracer *opentracing.Tracer
 )
 
 func main() {
 	initialize()
-
 	router := gin.Default()
 
-	setMiddlewares(router)
+	serverutils.SetMiddlewares(router, tracer)
+	serverutils.SetMonitoringHandler(router)
 	setRoutes(router)
 
 	srv := &http.Server{
-		Addr:    ":" + getEnvOr("PORT", "3000"),
+		Addr:    ":" + serverutils.GetEnvOr("PORT", "3000"),
 		Handler: router,
 	}
 
@@ -42,18 +33,11 @@ func main() {
 		}
 	}()
 
-	gracefulShutdown(srv)
+	serverutils.GracefulShutdown(srv)
 }
 
 func initialize() {
-	if isTracingEnabled() {
-		initJaeger("service-name")
-		customMiddlewares = append(customMiddlewares, jaegerMiddleware)
-	}
-}
-
-func setMiddlewares(router *gin.Engine) {
-	for _, middleware := range customMiddlewares {
-		router.Use(middleware)
+	if serverutils.GetEnvOr("TRACING_ENABLED", "false") == "true" {
+		tracer = serverutils.InitJaeger("service-name")
 	}
 }
