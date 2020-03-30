@@ -13,11 +13,6 @@ type Person struct {
 }
 
 func setRoutes(router *gin.Engine) {
-	// http localhost:3000/health
-	router.GET("/health", func(c *gin.Context) {
-		c.Data(http.StatusOK, "application/json", []byte("OK"))
-	})
-
 	// http POST localhost:3000/person name='ronen' age:=36
 	router.POST("/person", func(c *gin.Context) {
 		var person Person

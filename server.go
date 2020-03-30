@@ -13,12 +13,16 @@ var (
 	tracer *opentracing.Tracer
 )
 
+const (
+	serviceName = "my-service-name"
+)
+
 func main() {
 	initialize()
 	router := gin.Default()
 
 	serverutils.SetMiddlewares(router, tracer)
-	serverutils.SetMonitoringHandler(router)
+	serverutils.SetRoutes(router, serviceName)
 	setRoutes(router)
 
 	srv := &http.Server{
@@ -38,6 +42,6 @@ func main() {
 
 func initialize() {
 	if serverutils.GetEnvOr("TRACING_ENABLED", "false") == "true" {
-		tracer = serverutils.InitJaeger("service-name")
+		tracer = serverutils.InitJaeger(serviceName)
 	}
 }
