@@ -4,31 +4,24 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	serverutils "github.com/konfortes/go-server-utils/serverutils"
-	opentracing "github.com/opentracing/opentracing-go"
-)
-
-var (
-	tracer *opentracing.Tracer
+	"github.com/konfortes/go-server-utils/server"
+	"github.com/konfortes/go-server-utils/utils"
 )
 
 const (
-	serviceName = "my-service-name"
+	appName = "my-app-name"
 )
 
 func main() {
-	initialize()
-	router := gin.Default()
-
-	serverutils.SetMiddlewares(router, tracer, serviceName)
-	serverutils.SetRoutes(router, serviceName)
-	setRoutes(router)
-
-	srv := &http.Server{
-		Addr:    ":" + serverutils.GetEnvOr("PORT", "3000"),
-		Handler: router,
+	serverConfig := server.Config{
+		AppName:     "my-app-name",
+		Port:        utils.GetEnvOr("PORT", "3000"),
+		Env:         utils.GetEnvOr("ENV", "development"),
+		Handlers:    handlers(),
+		WithTracing: utils.GetEnvOr("TRACING_ENABLED", "false") == "true",
 	}
+
+	srv := server.Initialize(serverConfig)
 
 	go func() {
 		log.Println("listening on " + srv.Addr)
@@ -37,11 +30,5 @@ func main() {
 		}
 	}()
 
-	serverutils.GracefulShutdown(srv)
-}
-
-func initialize() {
-	if serverutils.GetEnvOr("TRACING_ENABLED", "false") == "true" {
-		tracer = serverutils.InitJaeger(serviceName)
-	}
+	server.GracefulShutdown(srv)
 }
