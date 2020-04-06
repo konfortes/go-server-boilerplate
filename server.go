@@ -14,11 +14,12 @@ const (
 
 func main() {
 	serverConfig := server.Config{
-		AppName:     "my-app-name",
-		Port:        utils.GetEnvOr("PORT", "3000"),
-		Env:         utils.GetEnvOr("ENV", "development"),
-		Handlers:    handlers(),
-		WithTracing: utils.GetEnvOr("TRACING_ENABLED", "false") == "true",
+		AppName:       appName,
+		Port:          utils.GetEnvOr("PORT", "3000"),
+		Env:           utils.GetEnvOr("ENV", "development"),
+		Handlers:      handlers(),
+		ShutdownHooks: []func(){func() { log.Println("bye bye") }},
+		WithTracing:   utils.GetEnvOr("TRACING_ENABLED", "false") == "true",
 	}
 
 	srv := server.Initialize(serverConfig)
