@@ -28,7 +28,7 @@ func personHandler(c *gin.Context) {
 	var person Person
 
 	if err := c.BindJSON(&person); err != nil {
-		// TODO: log to span
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
