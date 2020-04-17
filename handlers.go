@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/konfortes/go-server-utils/logging"
 	"github.com/konfortes/go-server-utils/server"
 )
 
@@ -20,6 +21,15 @@ func handlers() []server.Handler {
 			Method:  http.MethodPost,
 			Pattern: "/person",
 			H:       personHandler,
+		},
+		{
+			// http POST localhost:3000/person name='ronen' age:=36
+			Method:  http.MethodGet,
+			Pattern: "/ping",
+			H: func(c *gin.Context) {
+				logger := logging.Logger(c.Request.Context())
+				logger.Info("yo yo")
+			},
 		},
 	}
 }
